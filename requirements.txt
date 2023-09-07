@@ -1,1 +1,14 @@
-transformers
+# All services
+flask==2.3.3
+requests==2.31.0
+
+# embeddings
+transformers==4.33.0
+torch==2.0.1
+sentence-transformers==2.2.2
+
+# Search Service
+faiss-cpu==1.7.4
+
+# dev
+jupyterlab==4.0.5

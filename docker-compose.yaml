@@ -1,0 +1,45 @@
+version: '3'
+services:
+  web:
+    build: ./app/web_service
+    ports:
+      - "5000:5000"
+    networks:
+      - internal_network
+
+  embedder:
+    build: ./app/embedding_service
+    volumes:
+      - model_data:/app/model_data
+    networks:
+      - internal_network
+
+  searcher:
+    build: ./app/search_service
+    depends_on:
+      - db
+    volumes:
+      - index_data:/app/index_data
+    networks:
+      - internal_network
+
+  db:
+    build: ./app/search_service
+    volumes:
+      - db_data:/var/lib/sqlite
+    networks:
+      - internal_network
+
+  ingestion_service:
+    build: ./ingestion_service
+    networks:
+      - internal_network
+
+networks:
+  internal_network:
+    driver: bridge
+
+volumes:
+  model_data:
+  index_data:
+  db_data:
