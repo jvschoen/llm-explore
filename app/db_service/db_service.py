@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
 import sqlite3
+import os
 
 app = Flask(__name__)
 
@@ -22,7 +23,7 @@ def init_db():
     cursor = conn.cursor()
     cursor.execute(
         """
-        CREATE TABLE IF NOT EXISTS documents (
+        CREATE TABLE IF NOT EXISTS mapping (
             faiss_index_position INTEGER PRIMARY KEY,
             doc_id TEXT
         )
@@ -30,7 +31,6 @@ def init_db():
     conn.commit()
     conn.close()
 
-init_db()
 
 @app.route('/get_documents', methods=['POST'])
 def get_documents():
@@ -43,7 +43,6 @@ def get_documents():
     JSON response:
     {documents: [{doc_id: content}, ...]}
     """
-
     doc_ids = request.json['doc_ids']
     placeholder = ', '.join('?' for _ in doc_ids)
 
@@ -60,8 +59,8 @@ def get_documents():
 
     return jsonify({'documents': docs})
 
-@app.rout('/get_document_ids', methods=['POST'])
-def get_document_ids(doc_ids):
+@app.route('/get_document_ids', methods=['POST'])
+def get_document_ids():
     """
     This gets all document ids where the faiss index matches.
     There may be many Faiss indexes (embedding vectors) that
@@ -74,7 +73,7 @@ def get_document_ids(doc_ids):
     JSON response:
     {documents: [{doc_id: content}, ...]}
     """
-
+    doc_ids = request.json['doc_ids']
     placeholder = ', '.join('?' for _ in doc_ids)
     conn = sqlite3.connect(MAPPING_DB)
     cursor = conn.cursor()
@@ -90,7 +89,7 @@ def get_document_ids(doc_ids):
 
     return jsonify({'doc_ids': doc_ids})
 
-@app.route('/add_document', method=['POST'])
+@app.route('/add_document', methods=['POST'])
 def add_document():
     """
     expected {'content': 'full document of text'}
@@ -124,5 +123,7 @@ def add_mapping():
     return jsonify({'status': 'success'})
 
 
+init_db()
+
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5003)
+    app.run(host='0.0.0.0', port=os.environ['DB_SERVICE_PORT'])
