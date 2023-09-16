@@ -1,6 +1,13 @@
 # Overview
 This Repo is an exploration space for all things LLM including transformers, gpt, llama2
 
+# WIP - Where Am I
+
+* I have gotten to the point of prompting and querying the db, there are no returned results so must add one
+* I need to load some documents into the doc db and vectordb in order to run the prompt against the doc db
+
+
+
 # Resources
 
 * Embeddings:
