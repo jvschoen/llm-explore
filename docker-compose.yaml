@@ -3,9 +3,11 @@ services:
   web:
     build: ./app/web_service
     ports:
-      - "5000:5000"
+      - "5001:5001"
     networks:
       - internal_network
+    env_file:
+      - .env
 
   embedder:
     build: ./app/embedding_service
@@ -13,27 +15,35 @@ services:
       - model_data:/app/model_data
     networks:
       - internal_network
+    env_file:
+      - .env
 
   searcher:
     build: ./app/search_service
     depends_on:
-      - db
+      - doc_db
     volumes:
       - index_data:/app/index_data
     networks:
       - internal_network
+    env_file:
+      - .env
 
-  db:
-    build: ./app/search_service
+  doc_db:
+    build: ./app/db_service
     volumes:
       - db_data:/var/lib/sqlite
     networks:
       - internal_network
+    env_file:
+      - .env
 
-  ingestion_service:
-    build: ./ingestion_service
+  ingestor:
+    build: ./app/ingestion_service
     networks:
       - internal_network
+    env_file:
+      - .env
 
 networks:
   internal_network:
