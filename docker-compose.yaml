@@ -23,7 +23,7 @@ services:
     depends_on:
       - doc_db
     volumes:
-      - index_data:/app/index_data
+      - index_data:/app/index_data/
     networks:
       - internal_network
     env_file:
@@ -32,7 +32,7 @@ services:
   doc_db:
     build: ./app/db_service
     volumes:
-      - db_data:/var/lib/sqlite
+      - db_data:/app/db_data
     networks:
       - internal_network
     env_file:
