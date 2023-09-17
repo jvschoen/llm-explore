@@ -3,9 +3,10 @@ import sqlite3
 import os
 
 app = Flask(__name__)
+SQLITE_BASE_DIR = '/app/db_data'
+DOCUMENTS_DB = os.path.join(SQLITE_BASE_DIR, 'documents.db')
+MAPPING_DB = os.path.join(SQLITE_BASE_DIR, 'mapping.db')
 
-DOCUMENTS_DB = 'documents.db'
-MAPPING_DB = 'mapping.db'
 def init_db():
     conn = sqlite3.connect(DOCUMENTS_DB)
     cursor = conn.cursor()
@@ -30,6 +31,8 @@ def init_db():
         """)
     conn.commit()
     conn.close()
+
+init_db()
 
 
 @app.route('/get_documents', methods=['POST'])
@@ -113,7 +116,7 @@ def add_mapping():
     faiss_index_position = request.json['faiss_index_position']
     doc_id = request.json['doc_id']
 
-    conn = sqlite3.connect('mapping.db')
+    conn = sqlite3.connect(MAPPING_DB)
     cursor = conn.cursor()
     cursor.execute("INSERT INTO mapping (faiss_index_position, doc_id) VALUES (?, ?)",
                    (faiss_index_position, doc_id))
@@ -122,8 +125,22 @@ def add_mapping():
 
     return jsonify({'status': 'success'})
 
+@app.route('/clear_dbs', methods=['POST'])
+def clear_dbs():
+    # Clear Mapping DB
+    conn = sqlite3.connect(MAPPING_DB)
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM mapping")
+    conn.commit()
+    conn.close()
+    # Clear Doc DB
+    conn = sqlite3.connect(DOCUMENTS_DB)
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM documents")
+    conn.commit()
+    conn.close()
 
-init_db()
+    return jsonify({'status': 'success'})
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=os.environ['DB_SERVICE_PORT'])
