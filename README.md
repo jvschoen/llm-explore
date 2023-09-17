@@ -5,9 +5,11 @@ This Repo is an exploration space for all things LLM including transformers, gpt
 
 * I have gotten to the point of prompting and querying the db, there are no returned results so must add one
 * I need to load some documents into the doc db and vectordb in order to run the prompt against the doc db
-* Successful response for ingesting a txt document, however not validated yet
+* Successful response for ingesting a txt document. Validated that:
+    * the doc content is loaded to the documents.db
+    * the faiss index is updated with new vectors
 
-
+* The prompt is failing to retrieve the document ids and errors out at the doc_db call to get document ids.
 
 # Resources
 
