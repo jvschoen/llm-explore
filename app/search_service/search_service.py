@@ -20,6 +20,7 @@ def init_faiss_index():
         index = faiss.IndexFlatL2(384)
         faiss.write_index(index, INDEX_PATH)
 
+init_faiss_index()
 
 def load_faiss_index():
     return faiss.read_index(INDEX_PATH)
@@ -58,6 +59,7 @@ def add_embedding():
     index = load_faiss_index()
     faiss_index_position = index.ntotal
     index.add(embedding)
+    faiss.write_index(index, INDEX_PATH)
 
     # Update mapping database with the new relation
     response = requests.post(ADD_MAPPING_URL,
@@ -70,8 +72,6 @@ def add_embedding():
 def save_faiss_index():
     index = load_faiss_index()
     faiss.write_index(index, INDEX_PATH)
-
-init_faiss_index()
 
 if __name__ == '__main__':
     atexit.register(save_faiss_index)
