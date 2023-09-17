@@ -1,26 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <title>Document Management</title>
 </head>
+
 <body>
+    <div class="container">
+        <!-- Output Results Above -->
+        <div class="results">
+            <p id="output">{{ result }}</p>
+        </div>
 
-<!-- Form for uploading a document -->
-<h2>Upload a Document</h2>
-<form action="/" method="post" enctype="multipart/form-data">
-    <input type="file" name="file">
-    <input type="submit" value="Upload">
-</form>
+        <!-- Form for searching with a prompt or uploading file -->
+        <form action="/" method="post" enctype="multipart/form-data">
+            <!-- Tabs to switch between inputting a file or inputting text -->
+            <div class="tabs">
+                <button type="button" class="tab-button active" onclick="showTab('text')">Text Input</button>
+                <button type="button" class="tab-button" onclick="showTab('file')">File Input</button>
+            </div>
 
-<hr>
+            <!-- Input  -->
+            <div class="input-section" id="textInput">
+                <textarea id="prompt" name="prompt" placeholder="Enter your prompt here..."></textarea>
+            </div>
 
-<!-- Form for searching with a prompt -->
-<h2>Search with a Prompt</h2>
-<form action="/" method="post">
-    <textarea name="prompt" rows="4" cols="50" placeholder="Enter your search prompt..."></textarea><br>
-    <input type="submit" value="Search">
-</form>
+            <div class="input-section" id="fileInput" style="display: none;">
+                <input type="file" name="input_file">
+            </div>
 
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+    <script>
+        function showTab(tabName) {
+            if (tabName === 'text') {
+                document.getElementById('textInput').style.display = 'block';
+                document.getElementById('fileInput').style.display = 'none';
+            } else if (tabName === 'file') {
+                document.getElementById('textInput').style.display = 'none';
+                document.getElementById('fileInput').style.display = 'block';
+            }
+        }
+    </script>
 </body>
+
 </html>

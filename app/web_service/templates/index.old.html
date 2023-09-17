@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document Management</title>
+</head>
+<body>
+
+<!-- Form for uploading a document -->
+<h2>Upload a Document</h2>
+<form action="/" method="post" enctype="multipart/form-data">
+    <input type="file" name="file">
+    <input type="submit" value="Upload">
+</form>
+
+<hr>
+
+<!-- Form for searching with a prompt -->
+<h2>Search with a Prompt</h2>
+<form action="/" method="post">
+
+    <div class="tabs">
+        <button type="button" class="tab-button active" onclick="showTab('text')">Text Input</button>
+        <button type="button" class="tab-button" onclick="showTab('file')">File Input</button>
+    </div>
+
+    <div class="input-section" id="textInput">
+        <textarea name="prompt" rows="4" cols="50" placeholder="Enter your search prompt..."></textarea><br>
+    </div>
+
+    <div class="input-section" id="fileInput" style="display: none;">
+        <input type="file" name="user_file">
+    </div>
+
+
+    <input type="submit" value="Search">
+</form>
+
+<script>
+    function showTab(tabName) {
+        if (tabName === 'text') {
+            document.getElementById('textInput').style.display = 'block';
+            document.getElementById('fileInput').style.display = 'none';
+        } else if (tabName === 'file') {
+            document.getElementById('textInput').style.display = 'none';
+            document.getElementById('fileInput').style.display = 'block';
+        }
+    }
+</script>
+
+</body>
+</html>
