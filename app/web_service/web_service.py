@@ -14,19 +14,20 @@ INGEST_DOC_SERVICE_URL = f'http://ingestor:{os.environ["INGESTION_SERVICE_PORT"]
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    message = ""
     if request.method == 'POST':
-        if 'file' in request.files:
-            file = request.files['file']
-            result = ingest_doc(file)
-            return result
-
-        elif 'prompt' in request.form:
-            prompt = request.form['prompt']
+        prompt = request.form.get('prompt')
+        if prompt:
             embedding = get_embedding(prompt)
             docs = search_documents(embedding)
-        # Logic to handle embedding and communicate wiht other services here
-            return render_template('results.html', document_ids=docs)
-    return render_template('index.html')
+            message = f"Document Ids: {docs}"
+
+        file = request.files.get('input_file')
+        if file:
+            result = ingest_doc(file)
+            message = f'Uploading {file.filename}: {result}'
+
+    return render_template('index.html', result=message)
 
 
 def extract_text_from_file(file):
@@ -58,6 +59,7 @@ def extract_text_from_file(file):
 
 def ingest_doc(file):
 
+    content = str(extract_text_from_file(file))
     response = requests.post(INGEST_DOC_SERVICE_URL, json={'content': content})
     return jsonify(response.json())
 
