@@ -35,11 +35,11 @@ textarea {
     resize: vertical;
 }
 
+/* BUTTONS */
 button {
     display: block;
     margin-top: 10px;
     padding: 10px 20px;
-    background-color: #4CAF50;
     color: #fff;
     border: none;
     border-radius: 6px;
@@ -47,10 +47,22 @@ button {
     transition: background-color 0.3s;
 }
 
-button:hover {
+.button-red {
+    background-color: #D32F2F;
+}
+.button-red:hover {
+    background-color: #C12727;
+}
+
+.button-green .tab-button.active {
+    background-color: #4CAF50;
+}
+
+.button-green:hover {
     background-color: #45a049;
 }
 
+/* TABS */
 .tabs {
     margin-bottom: 15px;
 }
