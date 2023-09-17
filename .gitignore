@@ -2,3 +2,4 @@ secrets/
 .ipynb_checkpoints/
 llama/
 docs/
+.DS_Store
