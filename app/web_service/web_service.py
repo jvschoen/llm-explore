@@ -11,6 +11,7 @@ app = Flask(__name__)
 EMBEDDING_SERVICE_URL = f'http://embedder:{os.environ["EMBEDDING_SERVICE_PORT"]}/embed' # Embedding service on port 5001
 SEARCH_SERVICE_URL = f'http://searcher:{os.environ["SEARCH_SERVICE_PORT"]}/search'
 INGEST_DOC_SERVICE_URL = f'http://ingestor:{os.environ["INGESTION_SERVICE_PORT"]}/ingest_document'
+CLEAR_DBS_URL = f'http://doc_db:{os.environ["DB_SERVICE_PORT"]}/clear_dbs'
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -26,6 +27,11 @@ def index():
         if file:
             result = ingest_doc(file)
             message = f'Uploading {file.filename}: {result}'
+
+        clear_dbs_button = request.form.get('clear_dbs_button')
+        if clear_dbs_button:
+            result = clear_dbs()
+            message = f'{result}: Cleared Mapping and Document DBs'
 
     return render_template('index.html', result=message)
 
@@ -72,6 +78,10 @@ def get_embedding(text):
 def search_documents(embedding):
     response = requests.post(SEARCH_SERVICE_URL, json={'embedding': embedding})
     return response.json().get('documents')
+
+def clear_dbs():
+    response = requests.post(CLEAR_DBS_URL)
+    return response.json()
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=os.environ['WEB_SERVICE_PORT'])
