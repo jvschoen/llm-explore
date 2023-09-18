@@ -10,6 +10,8 @@ This Repo is an exploration space for all things LLM including transformers, gpt
     * the faiss index is updated with new vectors
 
 * The prompt is failing to retrieve the document ids and errors out at the doc_db call to get document ids.
+* Successfully returning docs to front end, and subsequently to the llm for inference. However, hitting a big blocker when trying to run the docker container on my macbook M1 gpu which torch can't access for inference.
+    - May need to start with CPU for inference...
 
 # Resources
 
