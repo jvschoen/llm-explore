@@ -1,0 +1,13 @@
+# All services
+flask==2.3.3
+requests==2.31.0
+
+# Model Reqs
+torch
+fairscale
+fire
+sentencepiece
+
+torchvision
+torchaudio
+-f https://download.pytorch.org/whl/cu111/torch_stable.html

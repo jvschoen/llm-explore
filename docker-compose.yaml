@@ -45,6 +45,14 @@ services:
     env_file:
       - .env
 
+  llm_chat:
+    build: ./app/llm_service
+    # TODO: add a volume and preload with model to avoid copying every time it needs to be built
+    networks:
+      - internal_network
+    env_file:
+      - .env
+
 networks:
   internal_network:
     driver: bridge
