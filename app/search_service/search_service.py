@@ -1,4 +1,5 @@
 # TODO: rename this to faiss service since we add and search
+import logging
 from flask import Flask, request, jsonify
 import requests
 import atexit
@@ -7,6 +8,8 @@ import os
 import numpy as np
 import faiss
 
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s - %(levelname)s - %(message)s')
 
 GET_DOC_IDS_URL = f'http://doc_db:{os.environ["DB_SERVICE_PORT"]}/get_document_ids'
 GET_DOCS_URL = f'http://doc_db:{os.environ["DB_SERVICE_PORT"]}/get_documents'
@@ -33,6 +36,9 @@ def search():
     to the user's input prompt
     """
     embedding = np.array(request.json['embedding']).reshape(1, -1)
+    app.logger.info(f'Embedding Shape: {embedding.shape}')
+    app.logger.info(f'Embedding Type: {type(embedding)}')
+
     index = load_faiss_index()
     _, I = index.search(embedding, 5) # Top 5 closest embeddings
     indices = [int(index) for index in I[0]]
@@ -41,6 +47,7 @@ def search():
     # These indices map to source document ids
     response = requests.post(GET_DOC_IDS_URL,
                              json={'doc_ids': indices})
+
     matched_doc_ids = response.json().get('doc_ids')
     unique_doc_ids = list(set(matched_doc_ids))
 

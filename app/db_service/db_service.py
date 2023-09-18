@@ -1,6 +1,10 @@
+import logging
 from flask import Flask, request, jsonify
 import sqlite3
 import os
+
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s - %(levelname)s - %(message)s')
 
 app = Flask(__name__)
 SQLITE_BASE_DIR = '/app/db_data'
@@ -48,15 +52,16 @@ def get_documents():
     """
     doc_ids = request.json['doc_ids']
     placeholder = ', '.join('?' for _ in doc_ids)
+    sql_template = (
+        f"""
+        SELECT * FROM documents
+        WHERE doc_id IN ({placeholder})
+        """
+    )
 
     conn = sqlite3.connect(DOCUMENTS_DB)
     cursor = conn.cursor()
-    cursor.execute(
-        f"""
-        SELECT * FROM documents
-        WHERE doc_id IN ({placeholder})""",
-        doc_ids
-    )
+    cursor.execute(sql_template, doc_ids)
     docs = {row[0]: row[1] for row in cursor.fetchall()}
     conn.close()
 
@@ -70,6 +75,9 @@ def get_document_ids():
     map to any single document. We chunk our input docs into
     token sizes (<512) to meet embedding model's constraints.
 
+    Input
+    "faiss_index_id"(int)
+
     Table Returned
     doc_id
 
@@ -77,15 +85,21 @@ def get_document_ids():
     {documents: [{doc_id: content}, ...]}
     """
     doc_ids = request.json['doc_ids']
+    app.logger.debug(f'Length of doc_ids: {len(doc_ids)}')
+    app.logger.debug(f'Doc Ids: {doc_ids}')
+
     placeholder = ', '.join('?' for _ in doc_ids)
+    sql_template = (
+    f"""
+    SELECT DISTINCT doc_id
+    FROM mapping
+    WHERE faiss_index_position IN ({placeholder})
+    """)
+    app.logger.debug(f'SQL Template: {sql_template}')
+
     conn = sqlite3.connect(MAPPING_DB)
     cursor = conn.cursor()
-
-    cursor.execute(
-        f"""
-        SELECT doc_id FROM mapping
-        WHERE faiss_index_position IN ({placeholder})
-        """)
+    cursor.execute(sql_template, doc_ids)
     fetched_docs = cursor.fetchall()
     doc_ids = [row[0] for row in fetched_docs]
     conn.close()
