@@ -1,3 +1,4 @@
+import logging
 from flask import Flask, render_template, request, jsonify
 import requests
 import os
@@ -6,12 +7,15 @@ from io import BytesIO
 from docx import Document
 from pypdf import PdfReader
 
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s - %(levelname)s - %(message)s')
 app = Flask(__name__)
 
 EMBEDDING_SERVICE_URL = f'http://embedder:{os.environ["EMBEDDING_SERVICE_PORT"]}/embed' # Embedding service on port 5001
 SEARCH_SERVICE_URL = f'http://searcher:{os.environ["SEARCH_SERVICE_PORT"]}/search'
 INGEST_DOC_SERVICE_URL = f'http://ingestor:{os.environ["INGESTION_SERVICE_PORT"]}/ingest_document'
 CLEAR_DBS_URL = f'http://doc_db:{os.environ["DB_SERVICE_PORT"]}/clear_dbs'
+LLM_SERVICE_URL = f'http://llm_chat:{os.environ["LLM_SERVICE_PORT"]}/infer'
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -21,7 +25,9 @@ def index():
         if prompt:
             embedding = get_embedding(prompt)
             docs = search_documents(embedding)
-            message = f"Document Ids: {docs}"
+            message = ask_chatbot(prompt, docs)
+
+
 
         file = request.files.get('input_file')
         if file:
@@ -63,6 +69,7 @@ def extract_text_from_file(file):
     else:
         raise ValueError(f"Unsupported file type: {file_extension}")
 
+
 def ingest_doc(file):
 
     content = str(extract_text_from_file(file))
@@ -79,9 +86,20 @@ def search_documents(embedding):
     response = requests.post(SEARCH_SERVICE_URL, json={'embedding': embedding})
     return response.json().get('documents')
 
+
 def clear_dbs():
     response = requests.post(CLEAR_DBS_URL)
     return response.json()
+
+def ask_chatbot(prompt, docs):
+
+    prompt_context = ''
+    for faiss_idx, text_chunk in docs.items():
+        prompt_context += text_chunk
+
+    response = requests.post(LLM_SERVICE_URL,
+                             json={'input_prompt': prompt,
+                                   'doc_text': prompt_context})
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=os.environ['WEB_SERVICE_PORT'])
